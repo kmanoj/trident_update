@@ -135,3 +135,22 @@ echo "##########################################################################
 echo "Upgrading Kubernetes to 1.18 is complete"
 echo "#######################################################################################################"
 
+echo "#######################################################################################################"
+echo "Upgrading Trident to v20.07"
+echo "#######################################################################################################"
+
+cd
+mv trident-installer/ trident-installer_old
+wget https://github.com/NetApp/trident/releases/download/v20.07.0/trident-installer-20.07.0.tar.gz
+tar -xf trident-installer-20.07.0.tar.gz
+cd trident-installer
+kubectl apply -f deploy/namespace.yaml
+kubectl create -f deploy/bundle.yaml
+tridentctl -n trident version
+kubectl get all -n trident
+tridentctl -n trident version
+
+echo "#######################################################################################################"
+echo "Upgraded Trident to v20.07"
+echo "#######################################################################################################"
+
