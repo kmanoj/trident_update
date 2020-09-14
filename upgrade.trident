@@ -131,3 +131,7 @@ ssh -o "StrictHostKeyChecking no" root@rhel2 systemctl restart kubelet
 ssh -o "StrictHostKeyChecking no" root@rhel2 systemctl daemon-reload
 sleep 30s
 
+echo "#######################################################################################################"
+echo "Upgrading Kubernetes to 1.18 is complete"
+echo "#######################################################################################################"
+
