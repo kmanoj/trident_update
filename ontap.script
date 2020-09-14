@@ -1,0 +1,15 @@
+vserver create -vserver iscsisvm1 -subtype default -rootvolume iscsisvm1_root -rootvolume-security-style unix -language C.UTF-8 -snapshot-policy none -data-services data-iscsi
+net int create -vserver iscsisvm1 -lif iscsi_lif1 -service-policy default-data-blocks -role data -data-protocol iscsi -address 192.168.0.151 -netmask 255.255.255.0 -home-node cluster1-01 -home-port e0d -status-admin up
+net int create -vserver iscsisvm1 -lif iscsi_lif2 -service-policy default-data-blocks -role data -data-protocol iscsi -address 192.168.0.152 -netmask 255.255.255.0 -home-node cluster1-01 -home-port e0d -status-admin up
+net int create -vserver iscsisvm1 -lif iscsisvm1_mgmt -service-policy default-management -role data -data-protocol none -address 192.168.0.145 -netmask 255.255.255.0 -home-node cluster1-01 -home-port e0c -status-admin up
+
+vserver modify -vserver iscsisvm1 -aggr-list aggr1,aggr2
+vserver modify -vserver svm1 -aggr-list aggr1,aggr2
+iscsi create -vserver iscsisvm1
+
+security login create -user-or-group-name trident_user -application ontapi -authentication-method password -role vsadmin -vserver svm1
+
+security login create -user-or-group-name trident_user -application ontapi -authentication-method password -role vsadmin -vserver iscsisvm1
+
+igroup create -vserver iscsisvm1 -igroup iscsi-ig1 -protocol iscsi -ostype linux
+
