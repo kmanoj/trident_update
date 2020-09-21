@@ -4,7 +4,7 @@ net int create -vserver iscsisvm1 -lif iscsi_lif2 -service-policy default-data-b
 net int create -vserver iscsisvm1 -lif iscsisvm1_mgmt -service-policy default-management -role data -data-protocol none -address 192.168.0.145 -netmask 255.255.255.0 -home-node cluster1-01 -home-port e0c -status-admin up
 
 vserver modify -vserver iscsisvm1 -aggr-list aggr1,aggr2
-vserver modify -vserver svm1 -aggr-list aggr1,aggr2
+
 iscsi create -vserver iscsisvm1
 
 security login role create -vserver iscsisvm1 -role trident_role -cmddirname DEFAULT -access none
@@ -32,29 +32,36 @@ security login role create -vserver iscsisvm1 -role trident_role -cmddirname "vs
 
 security login create -user-or-group-name trident_user -application ontapi -authentication-method password -role trident_role -vserver iscsisvm1
 
-security login role create -vserver svm1 -role trident_role -cmddirname DEFAULT -access none
-
-# grant common Trident permissions
-security login role create -vserver svm1 -role trident_role -cmddirname "event generate-autosupport-log" -access all
-security login role create -vserver svm1 -role trident_role -cmddirname "network interface" -access readonly
-security login role create -vserver svm1 -role trident_role -cmddirname "version" -access readonly
-security login role create -vserver svm1 -role trident_role -cmddirname "vserver" -access readonly
-security login role create -vserver svm1 -role trident_role -cmddirname "vserver nfs show" -access readonly
-security login role create -vserver svm1 -role trident_role -cmddirname "volume snapshot" -access all
-security login role create -vserver svm1 -role trident_role -cmddirname "volume clone" -access all
-security login role create -vserver svm1 -role trident_role -cmddirname "volume mount" -access all
-security login role create -vserver svm1 -role trident_role -cmddirname "snapmirror" -access all
-
-# grant ontap-san Trident permissions
-security login role create -vserver svm1 -role trident_role -cmddirname "vserver iscsi show" -access readonly
-security login role create -vserver svm1 -role trident_role -cmddirname "lun" -access all
-
-# grant ontap-nas-economy Trident permissions
-security login role create -vserver svm1 -role trident_role -cmddirname "vserver export-policy create" -access all
-security login role create -vserver svm1 -role trident_role -cmddirname "vserver export-policy rule create" -access all
-security login create -user-or-group-name trident_user -application ontapi -authentication-method password -role trident_role -vserver svm1
-
 ##Create igroup
 
 igroup create -vserver iscsisvm1 -igroup iscsi-ig1 -protocol iscsi -ostype linux
+###################################################################################################
+
+# Create trident role on nfs_svm
+
+vserver modify -vserver svm1 -aggr-list aggr1,aggr2
+vserver rename -vserver svm1 -newname nfs_svm
+security login role create -vserver nfs_svm -role trident_role -cmddirname DEFAULT -access none
+
+# grant common Trident permissions
+security login role create -vserver nfs_svm -role trident_role -cmddirname "event generate-autosupport-log" -access all
+security login role create -vserver nfs_svm -role trident_role -cmddirname "network interface" -access readonly
+security login role create -vserver nfs_svm -role trident_role -cmddirname "version" -access readonly
+security login role create -vserver nfs_svm -role trident_role -cmddirname "vserver" -access readonly
+security login role create -vserver nfs_svm -role trident_role -cmddirname "vserver nfs show" -access readonly
+security login role create -vserver nfs_svm -role trident_role -cmddirname "volume snapshot" -access all
+security login role create -vserver nfs_svm -role trident_role -cmddirname "volume clone" -access all
+security login role create -vserver nfs_svm -role trident_role -cmddirname "volume mount" -access all
+security login role create -vserver nfs_svm -role trident_role -cmddirname "snapmirror" -access all
+
+# grant ontap-san Trident permissions
+security login role create -vserver nfs_svm -role trident_role -cmddirname "vserver iscsi show" -access readonly
+security login role create -vserver nfs_svm -role trident_role -cmddirname "lun" -access all
+
+# grant ontap-nas-economy Trident permissions
+security login role create -vserver nfs_svm -role trident_role -cmddirname "vserver export-policy create" -access all
+security login role create -vserver nfs_svm -role trident_role -cmddirname "vserver export-policy rule create" -access all
+security login create -user-or-group-name trident_user -application ontapi -authentication-method password -role trident_role -vserver nfs_svm
+
+
 
