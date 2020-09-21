@@ -139,15 +139,15 @@ echo "##########################################################################
 echo "Upgrading Trident to v20.07"
 echo "#######################################################################################################"
 
-cd
+cd /root
 mv trident-installer/ trident-installer_old
 wget https://github.com/NetApp/trident/releases/download/v20.07.0/trident-installer-20.07.0.tar.gz
 tar -xf trident-installer-20.07.0.tar.gz
-cd trident-installer
+cd /root/trident-installer
+kubectl create namespace trident
 kubectl create -f deploy/crds/trident.netapp.io_tridentprovisioners_crd_post1.16.yaml
 kubectl create -f deploy/bundle.yaml
 kubectl create -f deploy/crds/tridentprovisioner_cr.yaml
-kubectl create namespace trident
 kubectl get tprov -n trident
 kubectl describe tprov trident -n trident
 tridentctl version -n trident
