@@ -157,4 +157,6 @@ kubectl describe tprov trident -n trident
 echo "#######################################################################################################"
 echo "Upgraded Trident to v20.07"
 echo "#######################################################################################################"
+cd /root
+git clone https://github.com/kmanoj/Trident_tests
 
