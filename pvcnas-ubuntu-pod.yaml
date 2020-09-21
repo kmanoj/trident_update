@@ -1,0 +1,31 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pvc-nfs1
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: storage-class-nfs
+---
+kind: Pod
+apiVersion: v1
+metadata:
+  name: pvpod-ubuntu
+spec:
+  volumes:
+    - name: pv-nfs1
+      persistentVolumeClaim:
+       claimName: pvc-nfs1
+  containers:
+    - name: ubuntu-container
+      image: ubuntu:16.04
+      command:
+        - /bin/bash
+        - "-c"
+        - "sleep 60m"
+      volumeMounts:
+        - mountPath: "/data"
+          name: pv-nfs1
