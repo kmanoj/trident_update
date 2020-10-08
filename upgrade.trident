@@ -160,3 +160,72 @@ echo "##########################################################################
 cd /root
 git clone https://github.com/kmanoj/Trident_tests
 
+echo "#######################################################################################################"
+echo "Configure OnTap - Ensure that passwordless ssh is configured from rhel3 to OnTap cluster1"
+echo "#######################################################################################################"
+ssh admin@cluster1 vserver create -vserver iscsisvm1 -subtype default -rootvolume iscsisvm1_root -rootvolume-security-style unix -language C.UTF-8 -snapshot-policy none -data-services data-iscsi
+ssh admin@cluster1 net int create -vserver iscsisvm1 -lif iscsi_lif1 -service-policy default-data-blocks -role data -data-protocol iscsi -address 192.168.0.151 -netmask 255.255.255.0 -home-node cluster1-01 -home-port e0d ssh admin@cluster1 -status-admin up
+ssh admin@cluster1 net int create -vserver iscsisvm1 -lif iscsi_lif2 -service-policy default-data-blocks -role data -data-protocol iscsi -address 192.168.0.152 -netmask 255.255.255.0 -home-node cluster1-01 -home-port e0d ssh admin@cluster1 -status-admin up
+ssh admin@cluster1 net int create -vserver iscsisvm1 -lif iscsisvm1_mgmt -service-policy default-management -role data -data-protocol none -address 192.168.0.145 -netmask 255.255.255.0 -home-node cluster1-01 -home-port e0c ssh admin@cluster1 -status-admin up
+
+ssh admin@cluster1 vserver modify -vserver iscsisvm1 -aggr-list aggr1,aggr2
+
+ssh admin@cluster1 iscsi create -vserver iscsisvm1
+
+ssh admin@cluster1 security login role create -vserver iscsisvm1 -role trident_role -cmddirname DEFAULT -access none
+
+# grant common Trident permissions
+ssh admin@cluster1 security login role create -vserver iscsisvm1 -role trident_role -cmddirname "event generate-autosupport-log" -access all
+ssh admin@cluster1 security login role create -vserver iscsisvm1 -role trident_role -cmddirname "network interface" -access readonly
+ssh admin@cluster1 security login role create -vserver iscsisvm1 -role trident_role -cmddirname "version" -access readonly
+ssh admin@cluster1 security login role create -vserver iscsisvm1 -role trident_role -cmddirname "vserver" -access readonly
+ssh admin@cluster1 security login role create -vserver iscsisvm1 -role trident_role -cmddirname "vserver nfs show" -access readonly
+ssh admin@cluster1 security login role create -vserver iscsisvm1 -role trident_role -cmddirname "volume snapshot" -access all
+ssh admin@cluster1 security login role create -vserver iscsisvm1 -role trident_role -cmddirname "volume clone" -access all
+ssh admin@cluster1 security login role create -vserver iscsisvm1 -role trident_role -cmddirname "volume mount" -access all
+ssh admin@cluster1 security login role create -vserver iscsisvm1 -role trident_role -cmddirname "snapmirror" -access all
+
+# grant ontap-san Trident permissions
+ssh admin@cluster1 security login role create -vserver iscsisvm1 -role trident_role -cmddirname "vserver iscsi show" -access readonly
+ssh admin@cluster1 security login role create -vserver iscsisvm1 -role trident_role -cmddirname "lun" -access all
+
+# grant ontap-nas-economy Trident permissions
+ssh admin@cluster1 security login role create -vserver iscsisvm1 -role trident_role -cmddirname "vserver export-policy create" -access all
+ssh admin@cluster1 security login role create -vserver iscsisvm1 -role trident_role -cmddirname "vserver export-policy rule create" -access all
+
+# create a new Trident user with Trident role
+
+ssh admin@cluster1 security login create -user-or-group-name trident_user -application ontapi -authentication-method password -role trident_role -vserver iscsisvm1
+
+##Create igroup
+
+ssh admin@cluster1 igroup create -vserver iscsisvm1 -igroup iscsi-ig1 -protocol iscsi -ostype linux
+###################################################################################################
+
+# Create trident role on nfs_svm
+
+ssh admin@cluster1 vserver modify -vserver svm1 -aggr-list aggr1,aggr2
+ssh admin@cluster1 vserver rename -vserver svm1 -newname nfs_svm
+ssh admin@cluster1 security login role create -vserver nfs_svm -role trident_role -cmddirname DEFAULT -access none
+
+# grant common Trident permissions
+ssh admin@cluster1 security login role create -vserver nfs_svm -role trident_role -cmddirname "event generate-autosupport-log" -access all
+ssh admin@cluster1 security login role create -vserver nfs_svm -role trident_role -cmddirname "network interface" -access readonly
+ssh admin@cluster1 security login role create -vserver nfs_svm -role trident_role -cmddirname "version" -access readonly
+ssh admin@cluster1 security login role create -vserver nfs_svm -role trident_role -cmddirname "vserver" -access readonly
+ssh admin@cluster1 security login role create -vserver nfs_svm -role trident_role -cmddirname "vserver nfs show" -access readonly
+ssh admin@cluster1 security login role create -vserver nfs_svm -role trident_role -cmddirname "volume snapshot" -access all
+ssh admin@cluster1 security login role create -vserver nfs_svm -role trident_role -cmddirname "volume clone" -access all
+ssh admin@cluster1 security login role create -vserver nfs_svm -role trident_role -cmddirname "volume mount" -access all
+ssh admin@cluster1 security login role create -vserver nfs_svm -role trident_role -cmddirname "snapmirror" -access all
+
+# grant ontap-san Trident permissions
+ssh admin@cluster1 security login role create -vserver nfs_svm -role trident_role -cmddirname "vserver iscsi show" -access readonly
+ssh admin@cluster1 security login role create -vserver nfs_svm -role trident_role -cmddirname "lun" -access all
+
+# grant ontap-nas-economy Trident permissions
+ssh admin@cluster1 security login role create -vserver nfs_svm -role trident_role -cmddirname "vserver export-policy create" -access all
+ssh admin@cluster1 security login role create -vserver nfs_svm -role trident_role -cmddirname "vserver export-policy rule create" -access all
+ssh admin@cluster1 security login create -user-or-group-name trident_user -application ontapi -authentication-method password -role trident_role -vserver nfs_svm
+ 
+
