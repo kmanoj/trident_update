@@ -1,1 +1,6 @@
 tridentctl create backend -n trident -f /root/trident_update/backend-nas-economy.yaml
+tridentctl create backend -n trident -f /root/trident_update/backend-nas.yaml
+kubectl get sc
+kubectl apply -f /root/trident_update/sc-nas.yaml
+kubectl apply -f /root/trident_update/sc-nas-economy.yaml
+kubectl get sc
