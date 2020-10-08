@@ -1,0 +1,1 @@
+tridentctl create backend -n trident -f /root/trident_update/backend-nas-economy.yaml
