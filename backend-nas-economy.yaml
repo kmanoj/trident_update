@@ -1,0 +1,15 @@
+{
+    "version": 1,
+    "storageDriverName": "ontap-nas-economy",
+    "backendName": "Backend-NFS-SVM-ECO",
+    "managementLIF": "192.168.0.135:443",
+    "dataLIF": "192.168.0.132",
+    "svm": "nfs_svm",
+    "username": "trident_user",
+    "password": "Netapp1!",
+    "autoExportPolicy": true,
+    "autoExportCIDRs": ["192.168.0.61/32", "192.168.0.62/32", "192.168.0.63/32"],
+    "storagePrefix": "k8s",
+    "limitVolumeSize": "50Gi",
+    "nfsMountOptions": "rw,bg,hard,vers=3,proto=tcp,timeo=600,rsize=65536,wsize=65536,nointr"
+}
