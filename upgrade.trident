@@ -141,8 +141,10 @@ echo "##########################################################################
 
 cd /root
 mv trident-installer/ trident-installer_old
-wget https://github.com/NetApp/trident/releases/download/v20.07.0/trident-installer-20.07.0.tar.gz
-tar -xf trident-installer-20.07.0.tar.gz
+# wget https://github.com/NetApp/trident/releases/download/v20.07.0/trident-installer-20.07.0.tar.gz
+wget https://github.com/NetApp/trident/releases/download/v20.10.0/trident-installer-20.10.0.tar.gz
+#tar -xf trident-installer-20.07.0.tar.gz
+tar -xf trident-installer-20.10.0.tar.gz
 cd /root/trident-installer
 kubectl create namespace trident
 kubectl create -f deploy/crds/trident.netapp.io_tridentprovisioners_crd_post1.16.yaml
